@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.JiaoanCollectionDao">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.jiaoan_id as jiaoanId
+        ,a.yonghu_id as yonghuId
+        ,a.jiaoan_collection_types as jiaoanCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.JiaoanCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,jiaoan.jiaoan_name as jiaoanName
+        ,jiaoan.jiaoan_photo as jiaoanPhoto
+        ,jiaoan.jiaoan_file as jiaoanFile
+        ,jiaoan.jiaoan_types as jiaoanTypes
+        ,jiaoan.jiaoan_clicknum as jiaoanClicknum
+        ,jiaoan.shangxia_types as shangxiaTypes
+        ,jiaoan.jiaoan_delete as jiaoanDelete
+        ,jiaoan.jiaoan_content as jiaoanContent
+        ,yonghu.yonghu_uuid_number as yonghuUuidNumber
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.banji_types as banjiTypes
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM jiaoan_collection  a
+        left JOIN jiaoan jiaoan ON a.jiaoan_id = jiaoan.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.jiaoanId != null and params.jiaoanId != ''">
+                and a.jiaoan_id = #{params.jiaoanId}
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test="params.jiaoanCollectionTypes != null and params.jiaoanCollectionTypes != ''">
+                and a.jiaoan_collection_types = #{params.jiaoanCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断教案的id不为空 -->
+            <if test=" params.jiaoanIdNotNull != '' and params.jiaoanIdNotNull != null and params.jiaoanIdNotNull != 'null' ">
+                and a.jiaoan_id IS NOT NULL
+            </if>
+            <if test="params.laoshiId != null  and params.laoshiId != ''">
+                and jiaoan.laoshi_id = #{params.laoshiId}
+            </if>
+            <if test=" params.jiaoanName != '' and params.jiaoanName != null and params.jiaoanName != 'null' ">
+                and jiaoan.jiaoan_name like CONCAT('%',#{params.jiaoanName},'%')
+            </if>
+            <if test="params.jiaoanTypes != null  and params.jiaoanTypes != ''">
+                and jiaoan.jiaoan_types = #{params.jiaoanTypes}
+            </if>
+
+            <if test="params.jiaoanClicknumStart != null  and params.jiaoanClicknumStart != '' ">
+                <![CDATA[  and jiaoan.jiaoan_clicknum >= #{params.jiaoanClicknumStart}   ]]>
+            </if>
+            <if test="params.jiaoanClicknumEnd != null  and params.jiaoanClicknumEnd != '' ">
+                <![CDATA[  and jiaoan.jiaoan_clicknum <= #{params.jiaoanClicknumEnd}   ]]>
+            </if>
+            <if test="params.jiaoanClicknum != null  and params.jiaoanClicknum != '' ">
+                and jiaoan.jiaoan_clicknum = #{params.jiaoanClicknum}
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and jiaoan.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.jiaoanDeleteStart != null  and params.jiaoanDeleteStart != '' ">
+                <![CDATA[  and jiaoan.jiaoan_delete >= #{params.jiaoanDeleteStart}   ]]>
+            </if>
+            <if test="params.jiaoanDeleteEnd != null  and params.jiaoanDeleteEnd != '' ">
+                <![CDATA[  and jiaoan.jiaoan_delete <= #{params.jiaoanDeleteEnd}   ]]>
+            </if>
+            <if test="params.jiaoanDelete != null  and params.jiaoanDelete != '' ">
+                and jiaoan.jiaoan_delete = #{params.jiaoanDelete}
+            </if>
+            <if test=" params.jiaoanContent != '' and params.jiaoanContent != null and params.jiaoanContent != 'null' ">
+                and jiaoan.jiaoan_content like CONCAT('%',#{params.jiaoanContent},'%')
+            </if>
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuUuidNumber != '' and params.yonghuUuidNumber != null and params.yonghuUuidNumber != 'null' ">
+                and yonghu.yonghu_uuid_number like CONCAT('%',#{params.yonghuUuidNumber},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test="params.banjiTypes != null  and params.banjiTypes != ''">
+                and yonghu.banji_types = #{params.banjiTypes}
+            </if>
+
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
